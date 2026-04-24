@@ -183,11 +183,15 @@ const Lesson1 = () => {
                     transform: [{ rotate: '90deg' }],
                   }}
                 >
-                  <Home
+                  <TouchableOpacity
+                    onPress={() => console.log('Home pressed')}
+                    activeOpacity={0.8}
                     style={{
                       transform: [{ translateX: 120 }, { translateY: 0 }],
                     }}
-                  />
+                  >
+                    <Home width={40} height={40} />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => console.log('ArrowRight pressed')}
                     activeOpacity={0.6}
