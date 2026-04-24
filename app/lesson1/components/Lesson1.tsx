@@ -67,19 +67,19 @@ const Lesson1 = () => {
               style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
             >
               <TouchableOpacity
-                onPress={() => {
-                  // Действие при нажатии на птичку
-                  console.log('Птичка нажата');
-                  // Например, выбор высокого звука
-                }}
+                onPress={() => console.log('Bird')}
                 activeOpacity={0.9}
+                style={{
+                  transform: [
+                    { translateX: 140 },
+                    { translateY: -150 },
+                    { rotate: '90deg' },
+                  ],
+                  width: 200,
+                  height: 500,
+                }}
               >
-                <Bird
-                  scale={1.22}
-                  style={{
-                    transform: [{ translateX: 70 }, { translateY: 0 }],
-                  }}
-                />
+                <Bird scale={2} />
               </TouchableOpacity>
             </View>
 
