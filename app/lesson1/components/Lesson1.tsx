@@ -122,13 +122,21 @@ const Lesson1 = () => {
                     transform: [{ translateX: 50 }, { translateY: 16 }],
                   }}
                 />
-                <View style={{ transform: [{ scale: 1.5 }] }}>
-                  <Save
-                    style={{
-                      transform: [{ translateX: 70 }, { translateY: 0 }],
-                    }}
-                  />
-                </View>
+                <TouchableOpacity
+                  onPress={() => console.log('Save pressed')}
+                  activeOpacity={0.6}
+                  style={{
+                    transform: [
+                      { scale: 1.5 },
+                      { translateX: 70 },
+                      { translateY: 0 },
+                    ],
+                    width: 40, // явно задайте
+                    height: 40,
+                  }}
+                >
+                  <Save width={24} height={24} />
+                </TouchableOpacity>
               </View>
 
               {/* <View
