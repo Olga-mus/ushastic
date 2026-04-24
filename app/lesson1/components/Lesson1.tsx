@@ -188,11 +188,15 @@ const Lesson1 = () => {
                       transform: [{ translateX: 120 }, { translateY: 0 }],
                     }}
                   />
-                  <ArrowRight
+                  <TouchableOpacity
+                    onPress={() => console.log('ArrowRight pressed')}
+                    activeOpacity={0.6}
                     style={{
-                      transform: [{ translateX: 150 }, { translateY: 0 }],
+                      transform: [{ translateX: 160 }, { translateY: 0 }],
                     }}
-                  />
+                  >
+                    <ArrowRight width={40} height={40} />
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
