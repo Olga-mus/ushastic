@@ -1,0 +1,204 @@
+import {
+  ImageBackground,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import Bear from './bear/Bear';
+import Bird from './bird/Bird';
+import ArrowRight from './menu/ArrowRight';
+import Carrot from './menu/Carrot';
+import Home from './menu/Home';
+import Repeat from './menu/Repeat';
+import Save from './menu/Save';
+import Ushastic from './ushastic/Ushastic';
+const Lesson1 = () => {
+  const styles = StyleSheet.create({
+    background: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+    },
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    },
+  });
+
+  return (
+    <ImageBackground
+      source={require('../../assets/images/forest.jpg')}
+      style={styles.background}
+      resizeMode="stretch"
+    >
+      <View style={styles.overlay}>
+        {/* Абсолютно позиционированные морковки в левом верхнем углу */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: [{ rotate: '90deg' }],
+            backgroundColor: 'yellow',
+            borderWidth: 1,
+            borderColor: 'white',
+            width: '24%',
+            height: '25%',
+            position: 'absolute',
+            top: 20,
+            left: 270,
+          }}
+        >
+          <Carrot />
+          <Carrot />
+          <Carrot />
+        </View>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+          }}
+        >
+          {/* Контейнер сетки – занимает всю ширину */}
+          <View style={{ width: '100%', flex: 1 }}>
+            {/* Первая строка */}
+            <View
+              style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  // Действие при нажатии на птичку
+                  console.log('Птичка нажата');
+                  // Например, выбор высокого звука
+                }}
+                activeOpacity={0.9}
+              >
+                <Bird
+                  scale={1.22}
+                  style={{
+                    transform: [{ translateX: 70 }, { translateY: 0 }],
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Вторая строка */}
+            <View
+              style={{
+                width: '100%',
+                height: '33.333%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <View
+                style={{
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: 'blue',
+                  borderWidth: 1,
+                  borderColor: 'white',
+                }}
+              />
+
+              <Ushastic scale={1} />
+
+              <View
+                style={{
+                  width: '25%',
+                  height: '33.333%',
+                  backgroundColor: 'yellow',
+                  borderWidth: 1,
+                  borderColor: 'white',
+                  transform: [{ rotate: '90deg' }],
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Repeat
+                  style={{
+                    transform: [{ translateX: 50 }, { translateY: 16 }],
+                  }}
+                />
+                <View style={{ transform: [{ scale: 1.5 }] }}>
+                  <Save
+                    style={{
+                      transform: [{ translateX: 70 }, { translateY: 0 }],
+                    }}
+                  />
+                </View>
+              </View>
+
+              {/* <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transform: [{ rotate: '90deg' }],
+                  backgroundColor: 'yellow',
+                  borderWidth: 1,
+                  borderColor: 'white',
+                  width: '24%',
+                  height: '25%',
+                }}
+              >
+                <Carrot />
+                <Carrot />
+                <Carrot />
+              </View> */}
+            </View>
+
+            {/* Третья строка */}
+            <View
+              style={{ width: '100%', height: '33.333%', flexDirection: 'row' }}
+            >
+              <Bear />
+              {/* <View
+                style={{
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: 'blue',
+                  borderWidth: 1,
+                  borderColor: 'white',
+                }}
+              /> */}
+              <View
+                style={{
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: 'green',
+                  borderWidth: 1,
+                  borderColor: 'white',
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transform: [{ rotate: '90deg' }],
+                  }}
+                >
+                  <Home
+                    style={{
+                      transform: [{ translateX: 120 }, { translateY: 0 }],
+                    }}
+                  />
+                  <ArrowRight
+                    style={{
+                      transform: [{ translateX: 150 }, { translateY: 0 }],
+                    }}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </ImageBackground>
+  );
+};
+
+export default Lesson1;
