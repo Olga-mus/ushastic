@@ -154,16 +154,18 @@ const Lesson1 = () => {
             <View
               style={{ width: '100%', height: '33.333%', flexDirection: 'row' }}
             >
-              <Bear />
-              {/* <View
+              <TouchableOpacity
+                onPress={() => console.log('Bear')}
+                activeOpacity={0.9}
                 style={{
-                  width: '25%',
-                  height: '100%',
-                  backgroundColor: 'blue',
-                  borderWidth: 1,
-                  borderColor: 'white',
+                  width: 270,
+                  height: 300,
+                  transform: [{ rotate: '90deg' }],
                 }}
-              /> */}
+              >
+                <Bear />
+              </TouchableOpacity>
+
               <View
                 style={{
                   width: '25%',
