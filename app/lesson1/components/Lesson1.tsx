@@ -117,11 +117,15 @@ const Lesson1 = () => {
                   justifyContent: 'center',
                 }}
               >
-                <Repeat
+                <TouchableOpacity
+                  onPress={() => console.log('Repeat pressed')}
+                  activeOpacity={0.7}
                   style={{
                     transform: [{ translateX: 50 }, { translateY: 16 }],
                   }}
-                />
+                >
+                  <Repeat width={70} height={70} />
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => console.log('Save pressed')}
                   activeOpacity={0.6}
@@ -129,7 +133,7 @@ const Lesson1 = () => {
                     transform: [
                       { scale: 1.5 },
                       { translateX: 70 },
-                      { translateY: 0 },
+                      { translateY: 8 },
                     ],
                     width: 40, // явно задайте
                     height: 40,
@@ -195,7 +199,7 @@ const Lesson1 = () => {
                     onPress={() => console.log('Home pressed')}
                     activeOpacity={0.8}
                     style={{
-                      transform: [{ translateX: 120 }, { translateY: 0 }],
+                      transform: [{ translateX: 70 }, { translateY: 0 }],
                     }}
                   >
                     <Home width={40} height={40} />
@@ -204,7 +208,7 @@ const Lesson1 = () => {
                     onPress={() => console.log('ArrowRight pressed')}
                     activeOpacity={0.6}
                     style={{
-                      transform: [{ translateX: 160 }, { translateY: 0 }],
+                      transform: [{ translateX: 130 }, { translateY: 0 }],
                     }}
                   >
                     <ArrowRight width={40} height={40} />
