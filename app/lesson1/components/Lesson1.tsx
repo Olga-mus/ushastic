@@ -1,5 +1,5 @@
 import { Audio } from 'expo-av';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   ImageBackground,
@@ -19,6 +19,7 @@ import Save from './menu/Save';
 import Ushastic from './ushastic/Ushastic';
 
 const Lesson1 = () => {
+  const [showStartButton, setShowStartButton] = useState(true);
   const styles = StyleSheet.create({
     background: {
       flex: 1,
@@ -32,6 +33,7 @@ const Lesson1 = () => {
   });
 
   const greeting = async () => {
+    setShowStartButton(false); // скрыть кнопку
     try {
       const { sound } = await Audio.Sound.createAsync(
         require('../../assets/sounds/lesson1/1.mp3'),
@@ -43,6 +45,7 @@ const Lesson1 = () => {
         }
       });
     } catch (error) {
+      setShowStartButton(false); // скрыть даже при ошибке
       console.error('Ошибка воспроизведения:', error);
     }
   };
@@ -118,10 +121,10 @@ const Lesson1 = () => {
               }}
             >
               <TouchableOpacity
-                onPress={() => console.log('Область нажата')}
+                onPress={greeting}
                 style={{
                   width: '20%',
-                  height: 'auto', // или убрать height, позволить контенту определять размер
+                  height: 'auto',
                   justifyContent: 'center',
                   alignItems: 'center',
                   transform: [{ translateX: 20 }, { translateY: -20 }],
@@ -134,8 +137,9 @@ const Lesson1 = () => {
                   shadowOpacity: 0.3,
                   shadowRadius: 3,
                   elevation: 5,
-                  paddingVertical: 10, // добавить отступы для красоты
+                  paddingVertical: 10,
                   paddingHorizontal: 10,
+                  opacity: showStartButton ? 1 : 0, // скрываем визуально
                 }}
                 activeOpacity={0.7}
               >
