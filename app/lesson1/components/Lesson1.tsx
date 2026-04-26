@@ -1,6 +1,10 @@
+import { Audio } from 'expo-av';
+import React from 'react';
+
 import {
   ImageBackground,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -13,6 +17,7 @@ import Home from './menu/Home';
 import Repeat from './menu/Repeat';
 import Save from './menu/Save';
 import Ushastic from './ushastic/Ushastic';
+
 const Lesson1 = () => {
   const styles = StyleSheet.create({
     background: {
@@ -25,6 +30,26 @@ const Lesson1 = () => {
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
   });
+
+  const greeting = async () => {
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        require('../../assets/sounds/lesson1/1.mp3'),
+      );
+      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+    } catch (error) {
+      console.error('Ошибка воспроизведения:', error);
+    }
+  };
+  // Пример использования при загрузке
+  // useEffect(() => {
+  //   greeting();
+  // }, []);
 
   return (
     <ImageBackground
@@ -40,9 +65,9 @@ const Lesson1 = () => {
             alignItems: 'center',
             justifyContent: 'center',
             transform: [{ rotate: '90deg' }],
-            backgroundColor: 'yellow',
-            borderWidth: 1,
-            borderColor: 'white',
+            // backgroundColor: 'yellow',
+            // borderWidth: 1,
+            // borderColor: 'white',
             width: '24%',
             height: '25%',
             position: 'absolute',
@@ -67,7 +92,7 @@ const Lesson1 = () => {
               style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
             >
               <TouchableOpacity
-                onPress={() => console.log('Bird')}
+                onPress={() => console.log('жми')}
                 activeOpacity={0.9}
                 style={{
                   transform: [
@@ -92,15 +117,43 @@ const Lesson1 = () => {
                 justifyContent: 'space-between',
               }}
             >
-              <View
+              <TouchableOpacity
+                onPress={() => console.log('Область нажата')}
                 style={{
-                  width: '25%',
-                  height: '100%',
-                  backgroundColor: 'blue',
-                  borderWidth: 1,
-                  borderColor: 'white',
+                  width: '20%',
+                  height: 'auto', // или убрать height, позволить контенту определять размер
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  transform: [{ translateX: 20 }, { translateY: -20 }],
+                  backgroundColor: '#2196F3',
+                  borderRadius: 20,
+                  borderWidth: 2,
+                  borderColor: '#ffffff',
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 3,
+                  elevation: 5,
+                  paddingVertical: 10, // добавить отступы для красоты
+                  paddingHorizontal: 10,
                 }}
-              />
+                activeOpacity={0.7}
+              >
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 'bold',
+                    color: 'white',
+                    transform: [{ rotate: '90deg' }],
+                    // чтобы текст не обрезался, можно задать минимальную ширину
+                    width: 100, // ширина после поворота = исходная высота текста
+                    textAlign: 'center',
+                  }}
+                >
+                  Начать
+                </Text>
+              </TouchableOpacity>
 
               <Ushastic scale={1} />
 
@@ -108,9 +161,9 @@ const Lesson1 = () => {
                 style={{
                   width: '25%',
                   height: '33.333%',
-                  backgroundColor: 'yellow',
-                  borderWidth: 1,
-                  borderColor: 'white',
+                  // backgroundColor: 'yellow',
+                  // borderWidth: 1,
+                  // borderColor: 'white',
                   transform: [{ rotate: '90deg' }],
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -121,10 +174,29 @@ const Lesson1 = () => {
                   onPress={() => console.log('Repeat pressed')}
                   activeOpacity={0.7}
                   style={{
-                    transform: [{ translateX: 50 }, { translateY: 16 }],
+                    transform: [{ translateX: 50 }, { translateY: 10 }],
+                    width: 60,
+                    height: 60,
+                    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                    borderRadius: 30, // половина ширины для круга (опционально)
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255, 255, 255, 0.8)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 3,
+                    elevation: 3,
                   }}
                 >
-                  <Repeat width={70} height={70} />
+                  <Repeat
+                    width={60}
+                    height={60}
+                    style={{
+                      transform: [{ translateX: 14 }, { translateY: 12 }],
+                    }}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => console.log('Save pressed')}
@@ -135,8 +207,20 @@ const Lesson1 = () => {
                       { translateX: 70 },
                       { translateY: 8 },
                     ],
-                    width: 40, // явно задайте
+                    width: 40,
                     height: 40,
+                    // добавляем визуальное оформление
+                    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                    borderRadius: 40,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255, 255, 255, 0.8)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 3,
+                    elevation: 3,
                   }}
                 >
                   <Save width={24} height={24} />
@@ -182,9 +266,9 @@ const Lesson1 = () => {
                 style={{
                   width: '25%',
                   height: '100%',
-                  backgroundColor: 'green',
-                  borderWidth: 1,
-                  borderColor: 'white',
+                  // backgroundColor: 'green',
+                  // borderWidth: 1,
+                  // borderColor: 'white',
                 }}
               >
                 <View
@@ -197,9 +281,19 @@ const Lesson1 = () => {
                 >
                   <TouchableOpacity
                     onPress={() => console.log('Home pressed')}
-                    activeOpacity={0.8}
+                    activeOpacity={0.7}
                     style={{
                       transform: [{ translateX: 70 }, { translateY: 0 }],
+                      padding: 12,
+                      backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                      borderRadius: 40,
+                      borderWidth: 1.5,
+                      borderColor: 'rgba(255, 255, 255, 0.8)',
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 3,
+                      elevation: 3,
                     }}
                   >
                     <Home width={40} height={40} />
@@ -208,7 +302,18 @@ const Lesson1 = () => {
                     onPress={() => console.log('ArrowRight pressed')}
                     activeOpacity={0.6}
                     style={{
-                      transform: [{ translateX: 130 }, { translateY: 0 }],
+                      transform: [{ translateX: 100 }, { translateY: 0 }],
+                      padding: 12,
+                      backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                      borderRadius: 40,
+                      borderWidth: 1.5,
+                      borderColor: 'rgba(255, 255, 255, 0.8)',
+                      // необязательная тень
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 3,
+                      elevation: 3,
                     }}
                   >
                     <ArrowRight width={40} height={40} />

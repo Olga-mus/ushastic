@@ -15,9 +15,9 @@ const Ushastic = ({ scale = 1 }) => {
   return (
     <View
       style={{
-        backgroundColor: 'lightgray',
-        borderWidth: 1,
-        borderColor: 'red',
+        // backgroundColor: 'lightgray',
+        // borderWidth: 1,
+        // borderColor: 'red',
         width: 120,
         height: 200,
         // flex: 1,
