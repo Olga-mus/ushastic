@@ -20,6 +20,7 @@ import Ushastic from './ushastic/Ushastic';
 
 const Lesson1 = () => {
   const [showStartButton, setShowStartButton] = useState(true);
+  const [isWaving, setIsWaving] = useState(false);
   const styles = StyleSheet.create({
     background: {
       flex: 1,
@@ -34,6 +35,8 @@ const Lesson1 = () => {
 
   const greeting = async () => {
     setShowStartButton(false); // скрыть кнопку
+    setIsWaving(true);
+
     try {
       const { sound } = await Audio.Sound.createAsync(
         require('../../assets/sounds/lesson1/1.mp3'),
@@ -42,11 +45,13 @@ const Lesson1 = () => {
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
           sound.unloadAsync();
+          setIsWaving(false); // убираем анимацию после звука
         }
       });
     } catch (error) {
       setShowStartButton(false); // скрыть даже при ошибке
       console.error('Ошибка воспроизведения:', error);
+      setIsWaving(false); // убираем анимацию после звука
     }
   };
   // Пример использования при загрузке
@@ -159,7 +164,7 @@ const Lesson1 = () => {
                 </Text>
               </TouchableOpacity>
 
-              <Ushastic scale={1} />
+              <Ushastic scale={1} isWaving={isWaving} />
 
               <View
                 style={{

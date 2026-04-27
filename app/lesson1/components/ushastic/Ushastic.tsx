@@ -1,6 +1,7 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, View } from 'react-native';
 import { G, Svg } from 'react-native-svg';
+
 import Body from './Body';
 import EarExternal from './EarExternal';
 import EarInside from './EarInside';
@@ -10,8 +11,55 @@ import EyeWhite from './EyeWhite';
 import HandLeft from './HandLeft';
 import HandRight from './HandRight';
 import Mouth from './Mouth';
+const AnimatedG = Animated.createAnimatedComponent(G);
 
-const Ushastic = ({ scale = 1 }) => {
+const Ushastic = ({ scale = 1, isWaving = false }) => {
+  const handRotate = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isWaving) {
+      let cycles = 0;
+      const maxCycles = 4; // ~4 секунды (один цикл ~0.5 сек), подберите нужное число
+      const wave = () => {
+        if (cycles >= maxCycles) {
+          handRotate.setValue(0);
+          return;
+        }
+        cycles++;
+        Animated.sequence([
+          Animated.timing(handRotate, {
+            toValue: 25,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(handRotate, {
+            toValue: -25,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(handRotate, {
+            toValue: 15,
+            duration: 80,
+            useNativeDriver: true,
+          }),
+          Animated.timing(handRotate, {
+            toValue: -15,
+            duration: 80,
+            useNativeDriver: true,
+          }),
+          Animated.timing(handRotate, {
+            toValue: 0,
+            duration: 120,
+            useNativeDriver: true,
+          }),
+        ]).start(wave);
+      };
+      wave();
+    } else {
+      handRotate.setValue(0);
+    }
+  }, [isWaving]);
+
   return (
     <View
       style={{
@@ -55,9 +103,20 @@ const Ushastic = ({ scale = 1 }) => {
             <G transform="translate(50, 150)">
               <HandLeft />
             </G>
-            <G transform="translate(560, 150)">
+            <AnimatedG
+              transform={[
+                { translateX: 560 },
+                { translateY: 150 },
+                {
+                  rotate: handRotate.interpolate({
+                    inputRange: [-30, 30],
+                    outputRange: ['-30deg', '30deg'],
+                  }),
+                },
+              ]}
+            >
               <HandRight />
-            </G>
+            </AnimatedG>
             <Body />
           </G>
           {/* Глаза */}
