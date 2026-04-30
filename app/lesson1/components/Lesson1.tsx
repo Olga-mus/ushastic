@@ -33,8 +33,28 @@ const Lesson1 = () => {
     },
   });
 
+  const greetingBird = () => {
+    return new Promise(async (resolve) => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../../assets/sounds/lesson1/2.mp3'), // свой звук для птички
+        );
+        await sound.playAsync();
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            sound.unloadAsync();
+            resolve(); // разрешаем Promise после окончания
+          }
+        });
+      } catch (error) {
+        console.error('Ошибка воспроизведения приветствия птички:', error);
+        resolve(); // разрешаем даже при ошибке, чтобы цепочка продолжилась
+      }
+    });
+  };
+
   const greeting = async () => {
-    setShowStartButton(false); // скрыть кнопку
+    setShowStartButton(false);
     setIsWaving(true);
 
     try {
@@ -42,22 +62,21 @@ const Lesson1 = () => {
         require('../../assets/sounds/lesson1/1.mp3'),
       );
       await sound.playAsync();
-      sound.setOnPlaybackStatusUpdate((status) => {
+      sound.setOnPlaybackStatusUpdate(async (status) => {
         if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-          setIsWaving(false); // убираем анимацию после звука
+          await sound.unloadAsync();
+          // Ждём окончания приветствия птички
+          await greetingBird();
+          // После всего выключаем махание
+          setIsWaving(false);
         }
       });
     } catch (error) {
-      setShowStartButton(false); // скрыть даже при ошибке
+      setShowStartButton(false);
       console.error('Ошибка воспроизведения:', error);
-      setIsWaving(false); // убираем анимацию после звука
+      setIsWaving(false);
     }
   };
-  // Пример использования при загрузке
-  // useEffect(() => {
-  //   greeting();
-  // }, []);
 
   return (
     <ImageBackground
