@@ -78,6 +78,28 @@ const Lesson1 = () => {
     }
   };
 
+  const playBirdSound = async () => {
+    console.log('playBirdSound вызвана');
+    try {
+      console.log('Начинаем загрузку bird.mp3');
+      const { sound } = await Audio.Sound.createAsync(
+        require('../../assets/sounds/lesson1/bird.mp3'),
+      );
+      console.log('Звук загружен, играем');
+      await sound.playAsync();
+      console.log('Воспроизведение запущено');
+      sound.setOnPlaybackStatusUpdate((status) => {
+        console.log('Статус воспроизведения:', status);
+        if (status.isLoaded && status.didJustFinish) {
+          console.log('Воспроизведение закончено');
+          sound.unloadAsync();
+        }
+      });
+    } catch (error) {
+      console.error('Ошибка воспроизведения звука птички:', error);
+    }
+  };
+
   return (
     <ImageBackground
       source={require('../../assets/images/forest.jpg')}
@@ -119,7 +141,8 @@ const Lesson1 = () => {
               style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
             >
               <TouchableOpacity
-                onPress={() => console.log('жми')}
+                onPress={playBirdSound}
+                // onPress={() => console.log('жми на птичку')}
                 activeOpacity={0.9}
                 style={{
                   transform: [
