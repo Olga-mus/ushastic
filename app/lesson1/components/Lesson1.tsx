@@ -21,6 +21,7 @@ import Ushastic from './ushastic/Ushastic';
 const Lesson1 = () => {
   const [showStartButton, setShowStartButton] = useState(true);
   const [isWaving, setIsWaving] = useState(false);
+  const [isBirdPlaying, setIsBirdPlaying] = useState(false);
   const styles = StyleSheet.create({
     background: {
       flex: 1,
@@ -79,24 +80,22 @@ const Lesson1 = () => {
   };
 
   const playBirdSound = async () => {
-    console.log('playBirdSound вызвана');
+    if (isBirdPlaying) return;
+    setIsBirdPlaying(true);
     try {
-      console.log('Начинаем загрузку bird.mp3');
       const { sound } = await Audio.Sound.createAsync(
         require('../../assets/sounds/lesson1/bird.mp3'),
       );
-      console.log('Звук загружен, играем');
       await sound.playAsync();
-      console.log('Воспроизведение запущено');
       sound.setOnPlaybackStatusUpdate((status) => {
-        console.log('Статус воспроизведения:', status);
         if (status.isLoaded && status.didJustFinish) {
-          console.log('Воспроизведение закончено');
           sound.unloadAsync();
+          setIsBirdPlaying(false);
         }
       });
     } catch (error) {
-      console.error('Ошибка воспроизведения звука птички:', error);
+      console.error(error);
+      setIsBirdPlaying(false);
     }
   };
 
