@@ -23,6 +23,7 @@ const Lesson1 = () => {
   const [isWaving, setIsWaving] = useState(false);
   const [isBirdPlaying, setIsBirdPlaying] = useState(false);
   const [preloadedBirdSound, setPreloadedBirdSound] = useState(null);
+
   const styles = StyleSheet.create({
     background: {
       flex: 1,
@@ -83,16 +84,19 @@ const Lesson1 = () => {
   };
 
   const playBirdSound = async () => {
-    if (!preloadedBirdSound) {
-      console.warn('Звук ещё не загружен');
-      return;
-    }
+    if (!preloadedBirdSound) return;
+    setIsBirdPlaying(true);
     try {
-      // Перемотать на начало, если звук уже играл или был на паузе
       await preloadedBirdSound.setPositionAsync(0);
       await preloadedBirdSound.playAsync();
+      preloadedBirdSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setIsBirdPlaying(false);
+        }
+      });
     } catch (error) {
-      console.error('Ошибка воспроизведения птички:', error);
+      console.error(error);
+      setIsBirdPlaying(false);
     }
   };
 
@@ -178,7 +182,7 @@ const Lesson1 = () => {
                   height: 500,
                 }}
               >
-                <Bird scale={2} />
+                <Bird scale={2} isSinging={isBirdPlaying} />
               </TouchableOpacity>
             </View>
 

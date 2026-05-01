@@ -17,7 +17,7 @@ function Body(props) {
         width={457}
         height={397}
         rx={178.5}
-        fill="#E7E7E7"
+        fill="#f4a06b"
         stroke="#000"
         strokeWidth={3}
       />
