@@ -1,7 +1,8 @@
 import { Audio } from 'expo-av';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import {
+  Animated,
   ImageBackground,
   StyleSheet,
   Text,
@@ -24,6 +25,7 @@ const Lesson1 = () => {
   const [isBirdPlaying, setIsBirdPlaying] = useState(false);
   const [preloadedBirdSound, setPreloadedBirdSound] = useState(null);
   const [waitingForRepeat, setWaitingForRepeat] = useState(false);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const styles = StyleSheet.create({
     background: {
@@ -86,8 +88,8 @@ const Lesson1 = () => {
 
   const playBirdSound = () => {
     return new Promise(async (resolve) => {
+      setIsBirdPlaying(true);
       if (!preloadedBirdSound) {
-        // fallback: загружаем звук, если ещё не предзагружен
         const { sound } = await Audio.Sound.createAsync(
           require('../../assets/sounds/lesson1/bird.mp3'),
         );
@@ -95,6 +97,7 @@ const Lesson1 = () => {
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && status.didJustFinish) {
             sound.unloadAsync();
+            setIsBirdPlaying(false);
             resolve();
           }
         });
@@ -104,6 +107,7 @@ const Lesson1 = () => {
       await preloadedBirdSound.playAsync();
       preloadedBirdSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
+          setIsBirdPlaying(false);
           resolve();
         }
       });
@@ -112,6 +116,7 @@ const Lesson1 = () => {
 
   const playBirdSoundRepeat = () => {
     return new Promise(async (resolve) => {
+      setIsBirdPlaying(true);
       if (!preloadedBirdSound) {
         const { sound } = await Audio.Sound.createAsync(
           require('../../assets/sounds/lesson1/bird.mp3'),
@@ -120,6 +125,7 @@ const Lesson1 = () => {
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && status.didJustFinish) {
             sound.unloadAsync();
+            setIsBirdPlaying(false);
             resolve();
           }
         });
@@ -129,6 +135,7 @@ const Lesson1 = () => {
       await preloadedBirdSound.playAsync();
       preloadedBirdSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
+          setIsBirdPlaying(false);
           resolve();
         }
       });
@@ -153,6 +160,28 @@ const Lesson1 = () => {
       }
     });
   };
+
+  useEffect(() => {
+    if (waitingForRepeat) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 0.5,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+      pulseAnim.stopAnimation();
+    }
+  }, [waitingForRepeat]);
 
   useEffect(() => {
     const preloadBirdSound = async () => {
@@ -222,32 +251,53 @@ const Lesson1 = () => {
             <View
               style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
             >
-              <TouchableOpacity
-                onPress={async () => {
-                  if (waitingForRepeat) {
-                    // повторное нажатие – запускаем пение и затем медведя
-                    setWaitingForRepeat(false);
-                    await playBirdSoundRepeat();
-                    await greetingBear(); // приветствие медведя
-                    setIsWaving(false);
-                  } else {
-                    await playBirdSound(); // обычное воспроизведение (если не в режиме ожидания)
-                  }
-                }}
-                // onPress={() => console.log('жми на птичку')}
-                activeOpacity={0.9}
-                style={{
-                  transform: [
-                    { translateX: 140 },
-                    { translateY: -150 },
-                    { rotate: '90deg' },
-                  ],
-                  width: 200,
-                  height: 500,
-                }}
-              >
-                <Bird scale={2} isSinging={isBirdPlaying} />
-              </TouchableOpacity>
+              <View style={{ position: 'relative', width: 200, height: 500 }}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    if (waitingForRepeat) {
+                      setWaitingForRepeat(false);
+                      await playBirdSoundRepeat();
+                      await greetingBear();
+                      setIsWaving(false);
+                    } else {
+                      await playBirdSound();
+                    }
+                  }}
+                  activeOpacity={0.9}
+                  style={{
+                    transform: [
+                      { translateX: 140 },
+                      { translateY: -150 },
+                      { rotate: '90deg' },
+                    ],
+                    width: 200,
+                    height: 500,
+                  }}
+                >
+                  <Bird scale={2} isSinging={isBirdPlaying} />
+                </TouchableOpacity>
+
+                {waitingForRepeat && (
+                  <Animated.View
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      transform: [
+                        { translateX: 90 },
+                        { translateY: 0 },
+                        { rotate: '90deg' },
+                      ],
+                      width: 140,
+                      height: 240,
+                      backgroundColor: 'rgba(255, 255, 0, 0.3)',
+                      borderRadius: 20,
+                      opacity: pulseAnim,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
+              </View>
             </View>
 
             {/* Вторая строка */}
