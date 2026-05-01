@@ -1,5 +1,5 @@
 import { Audio } from 'expo-av';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   ImageBackground,
@@ -22,6 +22,7 @@ const Lesson1 = () => {
   const [showStartButton, setShowStartButton] = useState(true);
   const [isWaving, setIsWaving] = useState(false);
   const [isBirdPlaying, setIsBirdPlaying] = useState(false);
+  const [preloadedBirdSound, setPreloadedBirdSound] = useState(null);
   const styles = StyleSheet.create({
     background: {
       flex: 1,
@@ -68,6 +69,8 @@ const Lesson1 = () => {
           await sound.unloadAsync();
           // Ждём окончания приветствия птички
           await greetingBird();
+          // Затем пение птички (bird.mp3):
+          await playBirdSound();
           // После всего выключаем махание
           setIsWaving(false);
         }
@@ -80,24 +83,46 @@ const Lesson1 = () => {
   };
 
   const playBirdSound = async () => {
-    if (isBirdPlaying) return;
-    setIsBirdPlaying(true);
+    if (!preloadedBirdSound) {
+      console.warn('Звук ещё не загружен');
+      return;
+    }
     try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/lesson1/bird.mp3'),
-      );
-      await sound.playAsync();
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-          setIsBirdPlaying(false);
-        }
-      });
+      // Перемотать на начало, если звук уже играл или был на паузе
+      await preloadedBirdSound.setPositionAsync(0);
+      await preloadedBirdSound.playAsync();
     } catch (error) {
-      console.error(error);
-      setIsBirdPlaying(false);
+      console.error('Ошибка воспроизведения птички:', error);
     }
   };
+
+  useEffect(() => {
+    const preloadBirdSound = async () => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../../assets/sounds/lesson1/bird.mp3'),
+        );
+        setPreloadedBirdSound(sound);
+        // Можно также сразу установить аудиорежим
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: false,
+          playThroughEarpieceAndroid: false,
+        });
+      } catch (error) {
+        console.error('Ошибка предзагрузки bird.mp3', error);
+      }
+    };
+    preloadBirdSound();
+
+    // Очистка при размонтировании
+    return () => {
+      if (preloadedBirdSound) {
+        preloadedBirdSound.unloadAsync();
+      }
+    };
+  }, []);
 
   return (
     <ImageBackground
