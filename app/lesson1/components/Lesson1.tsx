@@ -23,6 +23,7 @@ const Lesson1 = () => {
   const [isWaving, setIsWaving] = useState(false);
   const [isBirdPlaying, setIsBirdPlaying] = useState(false);
   const [preloadedBirdSound, setPreloadedBirdSound] = useState(null);
+  const [waitingForRepeat, setWaitingForRepeat] = useState(false);
 
   const styles = StyleSheet.create({
     background: {
@@ -68,12 +69,12 @@ const Lesson1 = () => {
       sound.setOnPlaybackStatusUpdate(async (status) => {
         if (status.isLoaded && status.didJustFinish) {
           await sound.unloadAsync();
-          // Ждём окончания приветствия птички
-          await greetingBird();
-          // Затем пение птички (bird.mp3):
-          await playBirdSound();
-          // После всего выключаем махание
-          setIsWaving(false);
+          await greetingBird(); // приветствие птички (2.mp3)
+          await playBirdSound(); // первое пение птички (bird.mp3)
+          // Теперь переходим в режим ожидания повторного нажатия
+          setWaitingForRepeat(true);
+          // Махание Ушастика продолжается
+          setIsWaving(true);
         }
       });
     } catch (error) {
@@ -83,21 +84,74 @@ const Lesson1 = () => {
     }
   };
 
-  const playBirdSound = async () => {
-    if (!preloadedBirdSound) return;
-    setIsBirdPlaying(true);
-    try {
+  const playBirdSound = () => {
+    return new Promise(async (resolve) => {
+      if (!preloadedBirdSound) {
+        // fallback: загружаем звук, если ещё не предзагружен
+        const { sound } = await Audio.Sound.createAsync(
+          require('../../assets/sounds/lesson1/bird.mp3'),
+        );
+        await sound.playAsync();
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            sound.unloadAsync();
+            resolve();
+          }
+        });
+        return;
+      }
       await preloadedBirdSound.setPositionAsync(0);
       await preloadedBirdSound.playAsync();
       preloadedBirdSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
-          setIsBirdPlaying(false);
+          resolve();
         }
       });
-    } catch (error) {
-      console.error(error);
-      setIsBirdPlaying(false);
-    }
+    });
+  };
+
+  const playBirdSoundRepeat = () => {
+    return new Promise(async (resolve) => {
+      if (!preloadedBirdSound) {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../../assets/sounds/lesson1/bird.mp3'),
+        );
+        await sound.playAsync();
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            sound.unloadAsync();
+            resolve();
+          }
+        });
+        return;
+      }
+      await preloadedBirdSound.setPositionAsync(0);
+      await preloadedBirdSound.playAsync();
+      preloadedBirdSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          resolve();
+        }
+      });
+    });
+  };
+  const greetingBear = () => {
+    return new Promise(async (resolve) => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../../assets/sounds/lesson1/3.mp3'),
+        );
+        await sound.playAsync();
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            sound.unloadAsync();
+            resolve();
+          }
+        });
+      } catch (error) {
+        console.error('Ошибка воспроизведения приветствия медведя:', error);
+        resolve();
+      }
+    });
   };
 
   useEffect(() => {
@@ -169,7 +223,17 @@ const Lesson1 = () => {
               style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
             >
               <TouchableOpacity
-                onPress={playBirdSound}
+                onPress={async () => {
+                  if (waitingForRepeat) {
+                    // повторное нажатие – запускаем пение и затем медведя
+                    setWaitingForRepeat(false);
+                    await playBirdSoundRepeat();
+                    await greetingBear(); // приветствие медведя
+                    setIsWaving(false);
+                  } else {
+                    await playBirdSound(); // обычное воспроизведение (если не в режиме ожидания)
+                  }
+                }}
                 // onPress={() => console.log('жми на птичку')}
                 activeOpacity={0.9}
                 style={{
