@@ -1,20 +1,31 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
 import { G, Svg } from 'react-native-svg';
 
+import BlinkEye from './BlinkEye';
 import Body from './Body';
 import EarExternal from './EarExternal';
 import EarInside from './EarInside';
-import EyeBlack from './EyeBlack';
-import EyePoint from './EyePoint';
-import EyeWhite from './EyeWhite';
 import HandLeft from './HandLeft';
 import HandRight from './HandRight';
 import Mouth from './Mouth';
-const AnimatedG = Animated.createAnimatedComponent(G);
+const AnimatedG = Animated.createAnimatedComponent(G); //
 
 const Ushastic = ({ scale = 1, isWaving = false }) => {
   const handRotate = useRef(new Animated.Value(0)).current;
+  const [isBlinking, setIsBlinking] = useState(false);
+
+  const blink = () => {
+    setIsBlinking(true);
+    setTimeout(() => setIsBlinking(false), 150); // 150 мс – типичное моргание
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      blink();
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (isWaving) {
@@ -120,25 +131,31 @@ const Ushastic = ({ scale = 1, isWaving = false }) => {
             <Body />
           </G>
           {/* Глаза */}
-          {/* Левый глаз*/}
+          {/* Левый глаз */}
           <G transform="translate(400, 360)">
-            <EyeWhite />
-            <G transform="translate(18, 20)">
-              <EyeBlack />
-              <G transform="translate(10, 0)">
-                <EyePoint />
-              </G>
-            </G>
+            <BlinkEye
+              blink={isBlinking}
+              pupilX={10}
+              pupilY={20}
+              pointX={10}
+              pointY={0}
+              lineY={24}
+              lineX1={0}
+              lineX2={0}
+            />
           </G>
-          {/* Правый глаз*/}
+          {/* Правый глаз */}
           <G transform="translate(220, 360)">
-            <EyeWhite />
-            <G transform="translate(18, 20)">
-              <EyeBlack />
-              <G transform="translate(10, 0)">
-                <EyePoint />
-              </G>
-            </G>
+            <BlinkEye
+              blink={isBlinking}
+              pupilX={10}
+              pupilY={20}
+              pointX={10}
+              pointY={0}
+              lineY={24}
+              lineX1={0}
+              lineX2={0}
+            />
           </G>
           {/* Рот */}
           <G transform="translate(340, 590)">
