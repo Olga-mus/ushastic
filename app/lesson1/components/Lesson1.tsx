@@ -149,15 +149,15 @@ const Lesson1 = () => {
           require('../../assets/sounds/lesson1/3ru.mp3'),
         );
         await sound.playAsync();
-        sound.setOnPlaybackStatusUpdate((status) => {
+        sound.setOnPlaybackStatusUpdate(async (status) => {
           if (status.isLoaded && status.didJustFinish) {
-            sound.unloadAsync();
-            resolve();
+            await sound.unloadAsync();
+            // Автоматически запускаем пение медведя
+            await playBearSinging();
           }
         });
       } catch (error) {
         console.error('Ошибка воспроизведения приветствия медведя:', error);
-        resolve();
       }
     });
   };
@@ -180,6 +180,27 @@ const Lesson1 = () => {
       console.error('Ошибка воспроизведения звука медведя:', error);
       setIsBearPlaying(false);
     }
+  };
+
+  //пение медведя сразу после его приветствия
+  const playBearSinging = () => {
+    return new Promise(async (resolve) => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../../assets/sounds/lesson1/bear.mp3'),
+        );
+        await sound.playAsync();
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            sound.unloadAsync();
+            resolve();
+          }
+        });
+      } catch (error) {
+        console.error('Ошибка воспроизведения пения медведя:', error);
+        resolve();
+      }
+    });
   };
 
   useEffect(() => {
