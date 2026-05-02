@@ -27,6 +27,8 @@ const Lesson1 = () => {
   const [waitingForRepeat, setWaitingForRepeat] = useState(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const [isBearPlaying, setIsBearPlaying] = useState(false);
+  const [waitingForBearRepeat, setWaitingForBearRepeat] = useState(false);
+  const bearPulseAnim = useRef(new Animated.Value(1)).current;
 
   const styles = StyleSheet.create({
     background: {
@@ -44,18 +46,18 @@ const Lesson1 = () => {
     return new Promise(async (resolve) => {
       try {
         const { sound } = await Audio.Sound.createAsync(
-          require('../../assets/sounds/lesson1/2ru.mp3'), // свой звук для птички
+          require('../../assets/sounds/lesson1/2ru.mp3'),
         );
         await sound.playAsync();
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && status.didJustFinish) {
             sound.unloadAsync();
-            resolve(); // разрешаем Promise после окончания
+            resolve();
           }
         });
       } catch (error) {
         console.error('Ошибка воспроизведения приветствия птички:', error);
-        resolve(); // разрешаем даже при ошибке, чтобы цепочка продолжилась
+        resolve();
       }
     });
   };
@@ -72,11 +74,9 @@ const Lesson1 = () => {
       sound.setOnPlaybackStatusUpdate(async (status) => {
         if (status.isLoaded && status.didJustFinish) {
           await sound.unloadAsync();
-          await greetingBird(); // приветствие птички (2.mp3)
-          await playBirdSound(); // первое пение птички (bird.mp3)
-          // Теперь переходим в режим ожидания повторного нажатия
+          await greetingBird();
+          await playBirdSound();
           setWaitingForRepeat(true);
-          // Махание Ушастика продолжается
           setIsWaving(true);
         }
       });
@@ -142,6 +142,7 @@ const Lesson1 = () => {
       });
     });
   };
+
   const greetingBear = () => {
     return new Promise(async (resolve) => {
       try {
@@ -152,12 +153,14 @@ const Lesson1 = () => {
         sound.setOnPlaybackStatusUpdate(async (status) => {
           if (status.isLoaded && status.didJustFinish) {
             await sound.unloadAsync();
-            // Автоматически запускаем пение медведя
             await playBearSinging();
+            setWaitingForBearRepeat(true); // после пения медведя – подсветка
+            resolve();
           }
         });
       } catch (error) {
         console.error('Ошибка воспроизведения приветствия медведя:', error);
+        resolve();
       }
     });
   };
@@ -182,7 +185,6 @@ const Lesson1 = () => {
     }
   };
 
-  //пение медведя сразу после его приветствия
   const playBearSinging = () => {
     return new Promise(async (resolve) => {
       try {
@@ -203,6 +205,7 @@ const Lesson1 = () => {
     });
   };
 
+  // Анимация пульсации для птички
   useEffect(() => {
     if (waitingForRepeat) {
       Animated.loop(
@@ -225,6 +228,29 @@ const Lesson1 = () => {
     }
   }, [waitingForRepeat]);
 
+  // Анимация пульсации для медведя
+  useEffect(() => {
+    if (waitingForBearRepeat) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(bearPulseAnim, {
+            toValue: 0.5,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(bearPulseAnim, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      bearPulseAnim.setValue(1);
+      bearPulseAnim.stopAnimation();
+    }
+  }, [waitingForBearRepeat]);
+
   useEffect(() => {
     const preloadBirdSound = async () => {
       try {
@@ -232,7 +258,6 @@ const Lesson1 = () => {
           require('../../assets/sounds/lesson1/bird.mp3'),
         );
         setPreloadedBirdSound(sound);
-        // Можно также сразу установить аудиорежим
         await Audio.setAudioModeAsync({
           playsInSilentModeIOS: true,
           staysActiveInBackground: false,
@@ -245,7 +270,6 @@ const Lesson1 = () => {
     };
     preloadBirdSound();
 
-    // Очистка при размонтировании
     return () => {
       if (preloadedBirdSound) {
         preloadedBirdSound.unloadAsync();
@@ -260,16 +284,13 @@ const Lesson1 = () => {
       resizeMode="stretch"
     >
       <View style={styles.overlay}>
-        {/* Абсолютно позиционированные морковки в левом верхнем углу */}
+        {/* Абсолютно позиционированные морковки */}
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             transform: [{ rotate: '90deg' }],
-            // backgroundColor: 'yellow',
-            // borderWidth: 1,
-            // borderColor: 'white',
             width: '24%',
             height: '25%',
             position: 'absolute',
@@ -281,15 +302,9 @@ const Lesson1 = () => {
           <Carrot />
           <Carrot />
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-          }}
-        >
-          {/* Контейнер сетки – занимает всю ширину */}
+        <View style={{ flex: 1, flexDirection: 'column' }}>
           <View style={{ width: '100%', flex: 1 }}>
-            {/* Первая строка */}
+            {/* Первая строка – птичка */}
             <View
               style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
             >
@@ -370,7 +385,7 @@ const Lesson1 = () => {
                   elevation: 5,
                   paddingVertical: 10,
                   paddingHorizontal: 10,
-                  opacity: showStartButton ? 1 : 0, // скрываем визуально
+                  opacity: showStartButton ? 1 : 0,
                 }}
                 activeOpacity={0.7}
               >
@@ -381,8 +396,7 @@ const Lesson1 = () => {
                     fontWeight: 'bold',
                     color: 'white',
                     transform: [{ rotate: '90deg' }],
-                    // чтобы текст не обрезался, можно задать минимальную ширину
-                    width: 100, // ширина после поворота = исходная высота текста
+                    width: 100,
                     textAlign: 'center',
                   }}
                 >
@@ -396,9 +410,6 @@ const Lesson1 = () => {
                 style={{
                   width: '25%',
                   height: '33.333%',
-                  // backgroundColor: 'yellow',
-                  // borderWidth: 1,
-                  // borderColor: 'white',
                   transform: [{ rotate: '90deg' }],
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -413,7 +424,7 @@ const Lesson1 = () => {
                     width: 60,
                     height: 60,
                     backgroundColor: 'rgba(255, 255, 255, 0.35)',
-                    borderRadius: 30, // половина ширины для круга (опционально)
+                    borderRadius: 30,
                     borderWidth: 1.5,
                     borderColor: 'rgba(255, 255, 255, 0.8)',
                     justifyContent: 'center',
@@ -444,7 +455,6 @@ const Lesson1 = () => {
                     ],
                     width: 40,
                     height: 40,
-                    // добавляем визуальное оформление
                     backgroundColor: 'rgba(255, 255, 255, 0.35)',
                     borderRadius: 40,
                     borderWidth: 1.5,
@@ -461,49 +471,55 @@ const Lesson1 = () => {
                   <Save width={24} height={24} />
                 </TouchableOpacity>
               </View>
-
-              {/* <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transform: [{ rotate: '90deg' }],
-                  backgroundColor: 'yellow',
-                  borderWidth: 1,
-                  borderColor: 'white',
-                  width: '24%',
-                  height: '25%',
-                }}
-              >
-                <Carrot />
-                <Carrot />
-                <Carrot />
-              </View> */}
             </View>
 
-            {/* Третья строка */}
+            {/* Третья строка – медведь */}
             <View
               style={{ width: '100%', height: '33.333%', flexDirection: 'row' }}
             >
-              <TouchableOpacity
-                onPress={playBearSound}
-                activeOpacity={0.9}
-                style={{
-                  width: 270,
-                  height: 300,
-                  transform: [{ rotate: '90deg' }],
-                }}
-              >
-                <Bear />
-              </TouchableOpacity>
+              <View style={{ position: 'relative', width: 270, height: 300 }}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    if (waitingForBearRepeat) {
+                      setWaitingForBearRepeat(false);
+                      await playBearSinging(); // ← добавить
+                      console.log('Медведь нажат после подсветки');
+                    } else {
+                      await playBearSound();
+                    }
+                  }}
+                  activeOpacity={0.9}
+                  style={{
+                    width: 270,
+                    height: 300,
+                    transform: [{ rotate: '90deg' }],
+                  }}
+                >
+                  <Bear />
+                </TouchableOpacity>
+
+                {waitingForBearRepeat && (
+                  <Animated.View
+                    style={{
+                      position: 'absolute',
+                      top: 50,
+                      left: 0,
+                      width: 200,
+                      height: 140,
+                      transform: [{ rotate: '90deg' }],
+                      backgroundColor: 'rgba(255, 255, 0, 0.3)',
+                      borderRadius: 20,
+                      opacity: bearPulseAnim,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
+              </View>
 
               <View
                 style={{
                   width: '25%',
                   height: '100%',
-                  // backgroundColor: 'green',
-                  // borderWidth: 1,
-                  // borderColor: 'white',
                 }}
               >
                 <View
@@ -543,7 +559,6 @@ const Lesson1 = () => {
                       borderRadius: 40,
                       borderWidth: 1.5,
                       borderColor: 'rgba(255, 255, 255, 0.8)',
-                      // необязательная тень
                       shadowColor: '#000',
                       shadowOffset: { width: 0, height: 2 },
                       shadowOpacity: 0.2,
