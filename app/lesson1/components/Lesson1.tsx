@@ -29,6 +29,7 @@ const Lesson1 = () => {
   const [isBearPlaying, setIsBearPlaying] = useState(false);
   const [waitingForBearRepeat, setWaitingForBearRepeat] = useState(false);
   const bearPulseAnim = useRef(new Animated.Value(1)).current;
+  const [isBearSinging, setIsBearSinging] = useState(false);
 
   const styles = StyleSheet.create({
     background: {
@@ -187,6 +188,11 @@ const Lesson1 = () => {
 
   const playBearSinging = () => {
     return new Promise(async (resolve) => {
+      // Принудительно сбрасываем и перезапускаем анимацию
+      setIsBearSinging(false);
+      // Даём React отрендерить сброс
+      await new Promise((r) => setTimeout(r, 0));
+      setIsBearSinging(true);
       try {
         const { sound } = await Audio.Sound.createAsync(
           require('../../assets/sounds/lesson1/bear.mp3'),
@@ -195,16 +201,17 @@ const Lesson1 = () => {
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && status.didJustFinish) {
             sound.unloadAsync();
+            setIsBearSinging(false);
             resolve();
           }
         });
       } catch (error) {
         console.error('Ошибка воспроизведения пения медведя:', error);
+        setIsBearSinging(false);
         resolve();
       }
     });
   };
-
   // Анимация пульсации для птички
   useEffect(() => {
     if (waitingForRepeat) {
@@ -482,11 +489,8 @@ const Lesson1 = () => {
                   onPress={async () => {
                     if (waitingForBearRepeat) {
                       setWaitingForBearRepeat(false);
-                      await playBearSinging(); // ← добавить
-                      console.log('Медведь нажат после подсветки');
-                    } else {
-                      await playBearSound();
                     }
+                    await playBearSinging(); // вызываем пение с анимацией всегда
                   }}
                   activeOpacity={0.9}
                   style={{
@@ -495,7 +499,7 @@ const Lesson1 = () => {
                     transform: [{ rotate: '90deg' }],
                   }}
                 >
-                  <Bear />
+                  <Bear isSinging={isBearSinging} />
                 </TouchableOpacity>
 
                 {waitingForBearRepeat && (
