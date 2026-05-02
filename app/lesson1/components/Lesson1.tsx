@@ -26,6 +26,7 @@ const Lesson1 = () => {
   const [preloadedBirdSound, setPreloadedBirdSound] = useState(null);
   const [waitingForRepeat, setWaitingForRepeat] = useState(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [isBearPlaying, setIsBearPlaying] = useState(false);
 
   const styles = StyleSheet.create({
     background: {
@@ -43,7 +44,7 @@ const Lesson1 = () => {
     return new Promise(async (resolve) => {
       try {
         const { sound } = await Audio.Sound.createAsync(
-          require('../../assets/sounds/lesson1/2.mp3'), // свой звук для птички
+          require('../../assets/sounds/lesson1/2ru.mp3'), // свой звук для птички
         );
         await sound.playAsync();
         sound.setOnPlaybackStatusUpdate((status) => {
@@ -65,7 +66,7 @@ const Lesson1 = () => {
 
     try {
       const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/lesson1/1.mp3'),
+        require('../../assets/sounds/lesson1/1ru.mp3'),
       );
       await sound.playAsync();
       sound.setOnPlaybackStatusUpdate(async (status) => {
@@ -145,7 +146,7 @@ const Lesson1 = () => {
     return new Promise(async (resolve) => {
       try {
         const { sound } = await Audio.Sound.createAsync(
-          require('../../assets/sounds/lesson1/3.mp3'),
+          require('../../assets/sounds/lesson1/3ru.mp3'),
         );
         await sound.playAsync();
         sound.setOnPlaybackStatusUpdate((status) => {
@@ -159,6 +160,26 @@ const Lesson1 = () => {
         resolve();
       }
     });
+  };
+
+  const playBearSound = async () => {
+    if (isBearPlaying) return;
+    setIsBearPlaying(true);
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        require('../../assets/sounds/lesson1/bear.mp3'),
+      );
+      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+          setIsBearPlaying(false);
+        }
+      });
+    } catch (error) {
+      console.error('Ошибка воспроизведения звука медведя:', error);
+      setIsBearPlaying(false);
+    }
   };
 
   useEffect(() => {
@@ -444,7 +465,7 @@ const Lesson1 = () => {
               style={{ width: '100%', height: '33.333%', flexDirection: 'row' }}
             >
               <TouchableOpacity
-                onPress={() => console.log('Bear')}
+                onPress={playBearSound}
                 activeOpacity={0.9}
                 style={{
                   width: 270,
