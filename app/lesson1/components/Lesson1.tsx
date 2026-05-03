@@ -30,6 +30,34 @@ const Lesson1 = () => {
   const [waitingForBearRepeat, setWaitingForBearRepeat] = useState(false);
   const bearPulseAnim = useRef(new Animated.Value(1)).current;
   const [isBearSinging, setIsBearSinging] = useState(false);
+  //функции взгляда
+  const [leftPupilX, setLeftPupilX] = useState(18);
+  const [leftPupilY, setLeftPupilY] = useState(20);
+  const [rightPupilX, setRightPupilX] = useState(18);
+  const [rightPupilY, setRightPupilY] = useState(20);
+
+  const lookAtBird = () => {
+    // Птичка находится справа внизу → взгляд вправо и вверх
+    setLeftPupilX(28); // сдвиг вправо
+    setLeftPupilY(12); // вверх (меньше, чем по умолчанию)
+    setRightPupilX(28);
+    setRightPupilY(12);
+  };
+
+  const lookAtBear = () => {
+    // Медведь находится слева вверху → взгляд влево и вниз
+    setLeftPupilX(5); // сдвиг влево
+    setLeftPupilY(28); // вниз
+    setRightPupilX(5);
+    setRightPupilY(28);
+  };
+
+  const resetEyes = () => {
+    setLeftPupilX(18);
+    setLeftPupilY(20);
+    setRightPupilX(18);
+    setRightPupilY(20);
+  };
 
   const styles = StyleSheet.create({
     background: {
@@ -45,6 +73,7 @@ const Lesson1 = () => {
 
   const greetingBird = () => {
     return new Promise(async (resolve) => {
+      lookAtBird(); // глаза на птичку
       try {
         const { sound } = await Audio.Sound.createAsync(
           require('../../assets/sounds/lesson1/2ru.mp3'),
@@ -52,6 +81,7 @@ const Lesson1 = () => {
         await sound.playAsync();
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && status.didJustFinish) {
+            resetEyes(); // вернуть взгляд в центр
             sound.unloadAsync();
             resolve();
           }
@@ -100,6 +130,7 @@ const Lesson1 = () => {
           if (status.isLoaded && status.didJustFinish) {
             sound.unloadAsync();
             setIsBirdPlaying(false);
+            resetEyes();
             resolve();
           }
         });
@@ -110,6 +141,7 @@ const Lesson1 = () => {
       preloadedBirdSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
           setIsBirdPlaying(false);
+          resetEyes();
           resolve();
         }
       });
@@ -138,6 +170,7 @@ const Lesson1 = () => {
       preloadedBirdSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
           setIsBirdPlaying(false);
+          resetEyes();
           resolve();
         }
       });
@@ -146,6 +179,7 @@ const Lesson1 = () => {
 
   const greetingBear = () => {
     return new Promise(async (resolve) => {
+      lookAtBear(); // глаза на медведя
       try {
         const { sound } = await Audio.Sound.createAsync(
           require('../../assets/sounds/lesson1/3ru.mp3'),
@@ -153,6 +187,7 @@ const Lesson1 = () => {
         await sound.playAsync();
         sound.setOnPlaybackStatusUpdate(async (status) => {
           if (status.isLoaded && status.didJustFinish) {
+            resetEyes(); // вернуть взгляд в центр
             await sound.unloadAsync();
             await playBearSinging();
             setWaitingForBearRepeat(true); // после пения медведя – подсветка
@@ -202,6 +237,7 @@ const Lesson1 = () => {
           if (status.isLoaded && status.didJustFinish) {
             sound.unloadAsync();
             setIsBearSinging(false);
+            resetEyes();
             resolve();
           }
         });
@@ -336,6 +372,7 @@ const Lesson1 = () => {
               <View style={{ position: 'relative', width: 270, height: 300 }}>
                 <TouchableOpacity
                   onPress={async () => {
+                    lookAtBear();
                     if (waitingForBearRepeat) {
                       setWaitingForBearRepeat(false);
                     }
@@ -420,7 +457,14 @@ const Lesson1 = () => {
                 style={{ transform: [{ translateX: 5 }, { translateY: 30 }] }}
               >
                 {/* 30 – сдвиг вправо */}
-                <Ushastic scale={1} isWaving={isWaving} />
+                <Ushastic
+                  scale={1}
+                  isWaving={isWaving}
+                  leftPupilX={leftPupilX}
+                  leftPupilY={leftPupilY}
+                  rightPupilX={rightPupilX}
+                  rightPupilY={rightPupilY}
+                />
               </View>
 
               <View
@@ -497,6 +541,7 @@ const Lesson1 = () => {
               <View style={{ position: 'relative', width: 200, height: 500 }}>
                 <TouchableOpacity
                   onPress={async () => {
+                    lookAtBird();
                     if (waitingForRepeat) {
                       setWaitingForRepeat(false);
                       await playBirdSoundRepeat();
