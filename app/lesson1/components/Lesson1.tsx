@@ -309,54 +309,43 @@ const Lesson1 = () => {
           <Carrot />
           <Carrot />
         </View>
+
         <View style={{ flex: 1, flexDirection: 'column' }}>
           <View style={{ width: '100%', flex: 1 }}>
-            {/* Первая строка – птичка */}
+            {/* Первая строка – МЕДВЕДЬ (слева) */}
             <View
               style={{ width: '100%', height: '33.33%', flexDirection: 'row' }}
             >
-              <View style={{ position: 'relative', width: 200, height: 500 }}>
+              <View style={{ position: 'relative', width: 270, height: 300 }}>
                 <TouchableOpacity
                   onPress={async () => {
-                    if (waitingForRepeat) {
-                      setWaitingForRepeat(false);
-                      await playBirdSoundRepeat();
-                      await greetingBear();
-                      setIsWaving(false);
-                    } else {
-                      await playBirdSound();
+                    if (waitingForBearRepeat) {
+                      setWaitingForBearRepeat(false);
                     }
+                    await playBearSinging();
                   }}
                   activeOpacity={0.9}
                   style={{
-                    transform: [
-                      { translateX: 140 },
-                      { translateY: -150 },
-                      { rotate: '90deg' },
-                    ],
-                    width: 200,
-                    height: 500,
+                    width: 270,
+                    height: 300,
+                    transform: [{ rotate: '90deg' }],
                   }}
                 >
-                  <Bird scale={2} isSinging={isBirdPlaying} />
+                  <Bear isSinging={isBearSinging} />
                 </TouchableOpacity>
 
-                {waitingForRepeat && (
+                {waitingForBearRepeat && (
                   <Animated.View
                     style={{
                       position: 'absolute',
-                      top: 0,
+                      top: 50,
                       left: 0,
-                      transform: [
-                        { translateX: 90 },
-                        { translateY: 0 },
-                        { rotate: '90deg' },
-                      ],
-                      width: 140,
-                      height: 240,
+                      width: 200,
+                      height: 140,
+                      transform: [{ rotate: '90deg' }],
                       backgroundColor: 'rgba(255, 255, 0, 0.3)',
                       borderRadius: 20,
-                      opacity: pulseAnim,
+                      opacity: bearPulseAnim,
                       pointerEvents: 'none',
                     }}
                   />
@@ -364,7 +353,7 @@ const Lesson1 = () => {
               </View>
             </View>
 
-            {/* Вторая строка */}
+            {/* Вторая строка – Кнопка "Начать", Ушастик, иконки */}
             <View
               style={{
                 width: '100%',
@@ -380,7 +369,7 @@ const Lesson1 = () => {
                   height: 'auto',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  transform: [{ translateX: 20 }, { translateY: -20 }],
+                  transform: [{ translateX: 20 }, { translateY: 20 }],
                   backgroundColor: '#2196F3',
                   borderRadius: 20,
                   borderWidth: 2,
@@ -410,8 +399,14 @@ const Lesson1 = () => {
                   Начать
                 </Text>
               </TouchableOpacity>
-
-              <Ushastic scale={1} isWaving={isWaving} />
+              <View
+                style={{ transform: [{ translateX: 5 }, { translateY: 30 }] }}
+              >
+                {' '}
+                {/* 30 – сдвиг вправо */}
+                <Ushastic scale={1} isWaving={isWaving} />
+              </View>
+              {/* <Ushastic scale={1} isWaving={isWaving} /> */}
 
               <View
                 style={{
@@ -480,52 +475,63 @@ const Lesson1 = () => {
               </View>
             </View>
 
-            {/* Третья строка – медведь */}
+            {/* Третья строка – ПТИЧКА (справа) */}
             <View
               style={{ width: '100%', height: '33.333%', flexDirection: 'row' }}
             >
-              <View style={{ position: 'relative', width: 270, height: 300 }}>
+              <View style={{ position: 'relative', width: 200, height: 500 }}>
                 <TouchableOpacity
                   onPress={async () => {
-                    if (waitingForBearRepeat) {
-                      setWaitingForBearRepeat(false);
+                    if (waitingForRepeat) {
+                      setWaitingForRepeat(false);
+                      await playBirdSoundRepeat();
+                      await greetingBear();
+                      setIsWaving(false);
+                    } else {
+                      await playBirdSound();
                     }
-                    await playBearSinging(); // вызываем пение с анимацией всегда
                   }}
                   activeOpacity={0.9}
                   style={{
-                    width: 270,
-                    height: 300,
-                    transform: [{ rotate: '90deg' }],
+                    transform: [
+                      { translateX: 140 },
+                      { translateY: -150 },
+                      { rotate: '90deg' },
+                      { scaleX: -1 }, // отражаем птичку
+                      { translateX: -20 },
+                      { translateY: 16 }, // компенсация, подберите нужное значение
+                    ],
+                    width: 200,
+                    height: 500,
                   }}
                 >
-                  <Bear isSinging={isBearSinging} />
+                  <Bird scale={2} isSinging={isBirdPlaying} />
                 </TouchableOpacity>
 
-                {waitingForBearRepeat && (
+                {waitingForRepeat && (
                   <Animated.View
                     style={{
                       position: 'absolute',
-                      top: 50,
+                      top: 0,
                       left: 0,
-                      width: 200,
-                      height: 140,
-                      transform: [{ rotate: '90deg' }],
+                      transform: [
+                        { translateX: 90 },
+                        { translateY: 0 },
+                        { rotate: '90deg' },
+                      ],
+                      width: 140,
+                      height: 240,
                       backgroundColor: 'rgba(255, 255, 0, 0.3)',
                       borderRadius: 20,
-                      opacity: bearPulseAnim,
+                      opacity: pulseAnim,
                       pointerEvents: 'none',
                     }}
                   />
                 )}
               </View>
 
-              <View
-                style={{
-                  width: '25%',
-                  height: '100%',
-                }}
-              >
+              {/* Блок с иконками Home и ArrowRight (оставляем справа) */}
+              <View style={{ width: '25%', height: '100%' }}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -538,7 +544,7 @@ const Lesson1 = () => {
                     onPress={() => console.log('Home pressed')}
                     activeOpacity={0.7}
                     style={{
-                      transform: [{ translateX: 70 }, { translateY: 0 }],
+                      transform: [{ translateX: 70 }, { translateY: -70 }],
                       padding: 12,
                       backgroundColor: 'rgba(255, 255, 255, 0.35)',
                       borderRadius: 40,
@@ -557,7 +563,7 @@ const Lesson1 = () => {
                     onPress={() => console.log('ArrowRight pressed')}
                     activeOpacity={0.6}
                     style={{
-                      transform: [{ translateX: 100 }, { translateY: 0 }],
+                      transform: [{ translateX: 100 }, { translateY: -70 }],
                       padding: 12,
                       backgroundColor: 'rgba(255, 255, 255, 0.35)',
                       borderRadius: 40,
