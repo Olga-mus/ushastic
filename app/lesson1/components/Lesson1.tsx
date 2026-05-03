@@ -292,22 +292,39 @@ const Lesson1 = () => {
     >
       <View style={styles.overlay}>
         {/* Абсолютно позиционированные морковки */}
+        {/* Абсолютно позиционированные морковки с контейнером */}
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transform: [{ rotate: '90deg' }],
-            width: '24%',
-            height: '25%',
             position: 'absolute',
             top: 20,
             left: 270,
+            width: '20%',
+            height: '25%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(251, 251, 251, 0.89)', // полупрозрачный тёмный фон
+            borderRadius: 30, // скругленные углы
+            borderWidth: 2,
+            borderColor: 'rgba(255, 255, 255, 0.6)',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 5,
           }}
         >
-          <Carrot />
-          <Carrot />
-          <Carrot />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: [{ rotate: '90deg' }, { translateX: 30 }],
+            }}
+          >
+            <Carrot />
+            <Carrot />
+            <Carrot />
+          </View>
         </View>
 
         <View style={{ flex: 1, flexDirection: 'column' }}>
@@ -402,11 +419,9 @@ const Lesson1 = () => {
               <View
                 style={{ transform: [{ translateX: 5 }, { translateY: 30 }] }}
               >
-                {' '}
                 {/* 30 – сдвиг вправо */}
                 <Ushastic scale={1} isWaving={isWaving} />
               </View>
-              {/* <Ushastic scale={1} isWaving={isWaving} /> */}
 
               <View
                 style={{
