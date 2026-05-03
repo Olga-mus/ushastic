@@ -1,9 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import { G, Svg } from 'react-native-svg';
-import EyeBlack from '../ushastic/EyeBlack';
-import EyePoint from '../ushastic/EyePoint';
-import EyeWhite from '../ushastic/EyeWhite';
+import BlinkEye from '../ushastic/BlinkEye'; // импортируем BlinkEye
 import Body from './Body';
 import Den from './Den';
 import Ear from './Ear';
@@ -15,6 +13,21 @@ const Bear = ({ style, isSinging = false }) => {
   const earScale = useRef(new Animated.Value(1)).current;
   const singingRef = useRef(isSinging);
   const animationRef = useRef(null);
+  const [isBlinking, setIsBlinking] = useState(false);
+
+  // подмигивание
+  useEffect(() => {
+    let blinkInterval;
+    if (isSinging) {
+      blinkInterval = setInterval(() => {
+        setIsBlinking(true);
+        setTimeout(() => setIsBlinking(false), 150);
+      }, 1000);
+    } else {
+      setIsBlinking(false);
+    }
+    return () => clearInterval(blinkInterval);
+  }, [isSinging]);
 
   // Обновляем ref при изменении пропа
   useEffect(() => {
@@ -22,9 +35,7 @@ const Bear = ({ style, isSinging = false }) => {
   }, [isSinging]);
 
   const wiggle = () => {
-    // Проверяем актуальное состояние через ref
     if (!singingRef.current) return;
-
     animationRef.current = Animated.sequence([
       Animated.timing(earScale, {
         toValue: 1.1,
@@ -46,9 +57,7 @@ const Bear = ({ style, isSinging = false }) => {
         duration: 100,
         useNativeDriver: true,
       }),
-    ]).start(() => {
-      wiggle(); // следующий цикл только если isSinging всё ещё true
-    });
+    ]).start(() => wiggle());
   };
 
   useEffect(() => {
@@ -56,19 +65,12 @@ const Bear = ({ style, isSinging = false }) => {
       earScale.setValue(1);
       wiggle();
     } else {
-      // Останавливаем текущую анимацию
-      if (animationRef.current) {
-        animationRef.current.stop();
-      }
-      // Возвращаем масштаб в исходное положение
+      if (animationRef.current) animationRef.current.stop();
       earScale.setValue(1);
     }
-
     return () => {
-      if (animationRef.current) {
-        animationRef.current.stop();
-        earScale.setValue(1);
-      }
+      if (animationRef.current) animationRef.current.stop();
+      earScale.setValue(1);
     };
   }, [isSinging]);
 
@@ -102,24 +104,36 @@ const Bear = ({ style, isSinging = false }) => {
           <G transform="translate(96, 130)">
             <Mouth />
           </G>
-          {/* Глаза */}
+
+          {/* Левый глаз – мигающий */}
           <G transform="translate(160, 30) scale(0.7)">
-            <EyeWhite />
-            <G transform="translate(18, 20)">
-              <EyeBlack />
-              <G transform="translate(10, 0)">
-                <EyePoint />
-              </G>
-            </G>
+            <BlinkEye
+              blink={isBlinking}
+              //зрачок
+              //точка
+              pupilX={30}
+              pupilY={10}
+              //черный глаз
+              pointX={26}
+              pointY={8}
+              //линия подмигивания
+              lineX1={60}
+              lineX2={40}
+              lineY={40}
+            />
           </G>
+          {/* Правый глаз – мигающий */}
           <G transform="translate(40, 30) scale(0.7)">
-            <EyeWhite />
-            <G transform="translate(18, 20)">
-              <EyeBlack />
-              <G transform="translate(10, 0)">
-                <EyePoint />
-              </G>
-            </G>
+            <BlinkEye
+              blink={isBlinking}
+              pupilX={30}
+              pupilY={10}
+              pointX={26}
+              pointY={8}
+              lineX1={60}
+              lineX2={40}
+              lineY={40}
+            />
           </G>
         </G>
       </G>
